@@ -1,0 +1,27 @@
+name: build_and_test_workflow
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build_and_test_job:
+    name: build_and_test
+    runs-on: ubuntu-18.04
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: pull_private_docker_image
+        run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+          docker pull dockerName/imageName:imageTag
+
+      - name: build_and_test_in_container
+        uses: ./actions/build_and_test_in_container
